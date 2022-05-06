@@ -1,0 +1,14 @@
+//Define the launchInfo for the module
+var moduleLaunchInfo = {
+    Name: "dongwaa",
+	Group: "Files",
+	IconPath: "dongwaa/image/small_icon.png",
+	Version: "0.0",
+	StartDir: "dongwaa/index.html",
+	SupportFW: true,
+	LaunchFWDir: "dongwaa/index.html",
+	InitFWSize: [1024, 768]
+}
+
+registerModule(JSON.stringify(moduleLaunchInfo));
+
