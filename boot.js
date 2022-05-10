@@ -1,5 +1,5 @@
 function renderTopBar(title = ' ', subtitle = '', buttonHTML = '', showSearch = false, additionalHTML = '') {
-    return `<style>body{background:white} @media (prefers-color-scheme: dark) {body{background:#0f0c09}}</style><div class="topbar flx">
+    return `<style>@media (max-width:520px) {body{background:white} @media (prefers-color-scheme: dark) {body{background:black}}}</style><div class="topbar flx">
     <button onclick="window.history.back();" class="acss aobh no_print" style="padding:0.5em;font-size:16px;white-space:pre;transition-duration:0s" id="btn_back" tabindex="0" title="back"><b>く<span class="no_mobile"> back</span></b></button>
     <div id="topbar_loading"></div>
     <div class="dwhdt flx dwhdto"><div class="dwhdt">
@@ -70,7 +70,10 @@ function renderBottomBarButtons(Buttons, path) {
     return results
 }
 
+var popArray = []
+
 var LoadingStatusQueue = 0;
+var errorLoadingCSS = ['<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;animation:none}</style>', '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;color:white;animation:none;content:"✘"}</style>']
 
 function LoadingStatus(type, presistant = false, title = '', subtitle = '') {
     if (type != 'hide' && LoadingStatusQueue > 0) {
@@ -99,13 +102,13 @@ function LoadingStatus(type, presistant = false, title = '', subtitle = '') {
         case 'error':
             LoadingStatus('show')
             presistTime = 6850; LoadingStatusQueue += 1; setTimeout(() => {LoadingStatusQueue -= 1}, presistTime + 750)
-            l.innerHTML = '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;color:white;animation:none;content:"✘"}</style>'
-            setTimeout(() => {l.innerHTML = '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;animation:none}</style>'}, 850)
-            setTimeout(() => {l.innerHTML = '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;color:white;animation:none;content:"✘"}</style>'}, 1350)
-            setTimeout(() => {l.innerHTML = '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;animation:none}</style>'}, 1850)
-            setTimeout(() => {l.innerHTML = '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;color:white;animation:none;content:"✘"}</style>'}, 2350)
-            setTimeout(() => {l.innerHTML = '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;animation:none}</style>'}, 2850)
-            setTimeout(() => {l.innerHTML = '<style>#topbar_loading::before{border-color:#FF4238!important;background-color:#FF4238;color:white;animation:none;content:"✘"}</style>'}, 3350)
+            l.innerHTML = errorLoadingCSS[1]
+            setTimeout(() => {l.innerHTML = errorLoadingCSS[0]}, 850)
+            setTimeout(() => {l.innerHTML = errorLoadingCSS[1]}, 1350)
+            setTimeout(() => {l.innerHTML = errorLoadingCSS[0]}, 1850)
+            setTimeout(() => {l.innerHTML = errorLoadingCSS[1]}, 2350)
+            setTimeout(() => {l.innerHTML = errorLoadingCSS[0]}, 2850)
+            setTimeout(() => {l.innerHTML = errorLoadingCSS[1]}, 3350)
             break
         case 'show':
             LoadingStatusQueue += 1; setTimeout(() => {LoadingStatusQueue -= 1}, 50)
@@ -133,18 +136,23 @@ function LoadingStatus(type, presistant = false, title = '', subtitle = '') {
             break
     }
     if (title) {
+        document.getElementById("topbar_title_inwarp_sec_buf").style.maxHeight = '0'
+        document.getElementById("topbar_title_inwrap_secondary").style.maxHeight = '0'
         document.getElementById("topbar_title_inwrap_main").style.opacity = 0
         document.getElementById("topbar_title_inwrap_secondary").style.opacity = 0
         document.getElementById("topbar_inwrap_title").innerText = title
         document.getElementById("topbar_inwrap_subtitle").innerText = subtitle
         setTimeout(() => {
-            document.getElementById("topbar_title_inwrap_main").style.display = 'none';
-            document.getElementById("topbar_title_inwrap_secondary").style.opacity = 1;
-            document.getElementById("topbar_title_inwarp_sec_buf").style.maxHeight = '3.5em';
+            document.getElementById("topbar_title_inwrap_main").style.display = 'none'
+            document.getElementById("topbar_title_inwrap_secondary").style.opacity = 1
+            document.getElementById("topbar_title_inwrap_secondary").style.maxHeight = 'unset'
+            document.getElementById("topbar_title_inwarp_sec_buf").style.maxHeight = '3.5em'
         }, 200)
     }
     if (!presistant) {
-        setTimeout(() => {LoadingStatus('hide')}, presistTime - 300)
+        setTimeout(() => {
+            LoadingStatus('hide')
+        }, presistTime - 300)
         setTimeout(() => {
             document.getElementById("topbar_title_inwrap_secondary").style.opacity = 0
             document.getElementById("topbar_title_inwarp_sec_buf").style.maxHeight = '0'
@@ -160,6 +168,7 @@ function LoadingStatus(type, presistant = false, title = '', subtitle = '') {
 
 //make back button works
 window.onpopstate = function (event) {
+    popArray.pop()
     boot(decodeURIComponent((event.state) ? event.state.plate : window.location.pathname), true)
 }
 
@@ -196,6 +205,7 @@ function hrefInterrupt(event) {
 //list of post-script cleanup
 function postCleanup() {
     document.querySelectorAll('a').forEach(link => link.addEventListener('mousedown', hrefInterrupt));
+    exe('cleanup')
 }
 
 //load new page
